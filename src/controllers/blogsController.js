@@ -1,18 +1,38 @@
 const blogModel = require("../models/blogModels");
+const authorModel = require("../models/authorModel");
+const jwt = require("jsonwebtoken");
 
-// 2 nd create Blog Api
+// 2) create Blog controller
 const createBlog = async function (req, res) {
   try {
     let blog = req.body;
-    let authorCreated = await blogModel.create(blog);
-    res.status(201).send({ data: authorCreated });
-  } catch (error) {
-    res.status(500).send(error.message);
+    if (blog) {
+      let author = await authorModel.find({ _id: blog.authorId });
+      if (author.length != 0) {
+        let blogCreated = await blogModel.create(blog);
+
+        if (blog.isPublished === true) {
+          let mainBlog = await blogModel.findOneAndUpdate(
+            { _id: blogCreated._id },
+            { $set: { publishedAt: Date.now() } },
+            { new: true }
+          );
+          return res.status(201).send({ msg: mainBlog });
+        }
+        return res.status(201).send({ msg: blogCreated });
+      } else {
+        return res.status(404).send("Author does not exist");
+      }
+    } else {
+      res.status(400).send("BAD REQUEST");
+    }
+  } catch (err) {
+    return res.status(500).send({ ERROR: err.message });
   }
 };
 
-// 3 rd API  get All Blogs
 
+// 3) getAllBlog controller
 const getSpecificAllBlogs = async function (req, res) {
   try {
     let data = req.query;
@@ -36,18 +56,16 @@ const getSpecificAllBlogs = async function (req, res) {
   }
 };
 
-//4  put API for Updating Blog
+//4) Updating Blog controller
 const updateBlog = async function (req, res) {
-  let blogId = req.params.blogId;
-
-  let data = req.body;
-
-  let x = await blogModel.findById(blogId);
-  console.log(x);
   try {
+    let data = req.body;
+    let blogId = req.params.blogId;
+    let x = await blogModel.findById(blogId);
+    console.log(x);
     if (x) {
       if (x.isDeleted === false) {
-        if (data.isPublished === true) {
+        if (x.isPublished === true) {
           let a = await blogModel.findOneAndUpdate(
             { _id: blogId },
             { $set: { isPublished: true, publishedAt: Date.now() } }
@@ -74,16 +92,19 @@ const updateBlog = async function (req, res) {
   }
 };
 
-// 5 th API for deleting blog by path params
+
+
+
+// 5)Delete blog by path params controller
 
 let deleteBlog = async function (req, res) {
   try {
-    let id = req.params.blogId;
-    console.log(id);
-    if (id) {
+    let blogId = req.params.blogId;
+    if (blogId) {
       let deletedBlog = await blogModel.findOneAndUpdate(
-        { _id: id },
-        { $set: { isDeleted: true } }
+        { _id: blogId },
+        { $set: { isDeleted: true }, deletedAt: Date.now() },
+        { new: true }
       );
       console.log(deletedBlog);
       res.send(deletedBlog);
@@ -93,7 +114,7 @@ let deleteBlog = async function (req, res) {
   }
 };
 
-// 6 th API  delete blog by using Query Params
+// 6)Delete blog by using Query Params controller
 let deletedByQueryParams = async function (req, res) {
   try {
     let data = req.query;
@@ -101,7 +122,7 @@ let deletedByQueryParams = async function (req, res) {
     if (data) {
       let deletedBlogsFinal = await blogModel.updateMany(
         { $in: data },
-        { $set: { isDeleted: true } }
+        { $set: { isDeleted: true }, deletedAt: Date.now() }
       );
 
       res.status(200).send({ status: true });

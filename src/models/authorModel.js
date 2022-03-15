@@ -8,12 +8,12 @@ const authorSchema = new mongoose.Schema(
       trim: true,
     },
 
-    FirstName: {
+    firstName: {
       type: String,
       required: true,
       trim: true,
     },
-    LastName: {
+    lastName: {
       type: String,
       required: true,
       trim: true,

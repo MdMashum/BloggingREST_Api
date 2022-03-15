@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const createBlog = new mongoose.Schema(
   {
     title: {
@@ -22,30 +23,23 @@ const createBlog = new mongoose.Schema(
       trim: true,
     },
     subcategory: [{ type: String, trim: true }],
-    deletedAt: {
-      type: String,
-      default: null,
-    },
+
     isDeleted: {
       type: Boolean,
       default: false,
     },
     publishedAt: {
-      type: String,
-      default: false,
+      type: Date,
     },
     isPublished: {
       type: Boolean,
       default: false,
     },
-    publishedAt: {
+    deletedAt: {
       type: Date,
-      default: Date.now,
     },
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model("Blogs", createBlog);
-
-
