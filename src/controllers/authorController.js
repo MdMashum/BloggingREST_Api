@@ -29,14 +29,15 @@ const authorLogin = async function (req, res) {
     });
 
 
-  let token = jwt.sign(
-    {
-      userId:SpecificAuther._id.toString(),
-      batch: "blogSite-phase2",
-      organisation: "FunctionUp",
-    },
-    "blogSites-phase2"
-  );
+    let token = jwt.sign(
+      {
+        authId: SpecificAuther._id.toString(),
+        batch: "blogSite-phase2",
+        organisation: "FunctionUp",
+      },
+      "blogSites-phase2",{expiresIn: "1hr"}
+    );
+
 
   res.status(201).send({ status: true, data: token });
 

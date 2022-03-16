@@ -8,15 +8,15 @@ const MiddleWere = require("../middlewares/Auth")
 router.post("/createAuthor",authorController.createAuthor)
 router.post("/login",authorController.authorLogin);
 
-//API's Blog
-router.post("/createBlog",MiddleWere.authorise,blogController.createBlog);
+//API's-Blog
+router.post("/createBlog",MiddleWere.authorAuthorization,blogController.createBlog);
 
-router.get("/getAllBlog",MiddleWere.authorise,blogController.getSpecificAllBlogs);
+router.get("/getAllBlog",MiddleWere.authorAuthorization,blogController.getSpecificAllBlogs);
 
 
 router.put("/updateBlog/:blogId",MiddleWere.authoriseForUpdateandDelete, blogController.updateBlog);
 router.delete("/deleted/blogs/:blogId",MiddleWere.authoriseForUpdateandDelete, blogController.deleteBlog);
-router.delete("/deletedByQuery",MiddleWere.authoriseDeleteForQueryParams,blogController.deletedByQueryParams);
+router.delete("/deletedByQuery",MiddleWere.authoriseForUpdateandDelete,blogController.deletedByQueryParams);
 
 
 

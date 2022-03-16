@@ -31,7 +31,6 @@ const createBlog = async function (req, res) {
   }
 };
 
-
 // 3) getAllBlog controller
 const getSpecificAllBlogs = async function (req, res) {
   try {
@@ -62,7 +61,7 @@ const updateBlog = async function (req, res) {
     let data = req.body;
     let blogId = req.params.blogId;
     let x = await blogModel.findById(blogId);
-    console.log(x);
+
     if (x) {
       if (x.isDeleted === false) {
         if (x.isPublished === true) {
@@ -92,9 +91,6 @@ const updateBlog = async function (req, res) {
   }
 };
 
-
-
-
 // 5)Delete blog by path params controller
 
 let deleteBlog = async function (req, res) {
@@ -122,10 +118,11 @@ let deletedByQueryParams = async function (req, res) {
     if (data) {
       let deletedBlogsFinal = await blogModel.updateMany(
         { $in: data },
-        { $set: { isDeleted: true }, deletedAt: Date.now() }
+        { $set: { isDeleted: true }, deletedAt: Date.now() },
+        { new: true }
       );
 
-      res.status(200).send({ status: true });
+      res.status(200).send({ status: true, result: deletedBlogsFinal });
     } else {
       res.status(400).send({ ERROR: "BAD REQUEST" });
     }
