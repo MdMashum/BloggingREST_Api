@@ -1,15 +1,16 @@
-const AuthorModel= require("../models/authorModel")
+const authorModel = require("../models/authorModel")
 const jwt = require("jsonwebtoken")
 
 
 
 //CREATE AUTHOR
-const createAuthor= async function (req, res) {
-   try{ let author = req.body
-    let authorCreated = await AuthorModel.create(author)
-    res.status(201).send({data: authorCreated})
-}catch (err) {
-    res.status(500).send({ ERROR: err.message });
+const createAuthor = async function (req, res) {
+  try {
+    let author = req.body
+    let authorCreated = await authorModel.create(author)
+    return res.status(201).send({ AuthorDetails : authorCreated })
+  } catch (err) {
+    return res.status(500).send({ ERROR: err.message });
   }
 
 }
@@ -17,36 +18,36 @@ const createAuthor= async function (req, res) {
 
 //AUTHOR-LOGIN
 const authorLogin = async function (req, res) {
- try{ let userName = req.body.email;
-  let password = req.body.password;
-  
-  let SpecificAuther = await AuthorModel.findOne({ email: userName, password: password });
+  try {
+    let authorName = req.body.email;
+    let password = req.body.password;
 
-  if (!SpecificAuther)
-    return res.status(404).send({
-      status: false,
-      msg: "username or the password is not corerct",
-    });
+    let specificAuther = await authorModel.findOne({ email: authorName, password: password });
+
+    if (!specificAuther)
+      return res.status(404).send({
+        status: false,
+        logInFailed: "username or the password is not correct",
+      });
 
 
     let token = jwt.sign(
       {
-        authId: SpecificAuther._id.toString(),
+        authId: specificAuther._id,
         batch: "blogSite-phase2",
         organisation: "FunctionUp",
       },
-      "blogSites-phase2",{expiresIn: "1hr"}
+      "blogSites-phase2", { expiresIn: "1hr" }
     );
 
+    return res.status(201).send({ status: true, TOKEN: token });
 
-  res.status(201).send({ status: true, data: token });
-
-}catch (err) {
-  res.status(500).send({ ERROR: err.message });
+  } catch (err) {
+    return res.status(500).send({ ERROR: err.message });
+  }
 }
-}
 
 
 
-module.exports.createAuthor= createAuthor;
+module.exports.createAuthor = createAuthor;
 module.exports.authorLogin = authorLogin;

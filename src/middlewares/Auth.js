@@ -1,58 +1,57 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModels");
 
-const authorAuthorization = function (req, res, next) {
+const autherAuthentication = function (req, res, next) {
   // compared the logged in user's Id and the Id in request
   try {
     let token = req.headers["x-api-key"];
     if (!token)
       return res.status(400).send({
         status: false,
-        msg: "token must be present in the request header",
+        ERROR: "token must be present in the request header",
       });
     let decodedToken = jwt.verify(token, "blogSites-phase2");
 
     if (!decodedToken)
-      return res.status(400).send({ status: false, msg: "token is not valid" });
-      let userLoggedIn = decodedToken.authId;
+      return res.status(400).send({ status: false, ERROR: "token is not valid" });
+    let userLoggedIn = decodedToken.authId;
+    console.log(userLoggedIn)
     let authorID = req.body.authorId;
     let authorID2 = req.query.authorId;
-
-   
-
+  
     if (!authorID) {
       if (authorID2 != userLoggedIn)
         return res.status(400).send({
           status: false,
-          msg: "User logged is not allowed to modify the requested users data",
+          ERROR: "User logged is not allowed to modify the requested users data",
         });
     }
     if (!authorID2) {
       if (authorID != userLoggedIn)
         return res.status(400).send({
           status: false,
-          msg: "User logged is not allowed to modify the requested users data",
+          ERROR: "User logged is not allowed to modify the requested users data",
         });
     }
-
+   
     next();
   } catch (err) {
-    res.status(500).send({ ERROR: err.message });
+   return res.status(500).send({ ERROR: err.message });
   }
 };
-const authoriseForUpdateandDelete = async function (req, res, next) {
+const authorAuthorization = async function (req, res, next) {
   // Get the Id from header
   try {
     let token = req.headers["x-api-key"];
     if (!token)
       return res.status(404).send({
         status: false,
-        msg: "token must be present in the request header",
+        Alert: "token must be present in the request header",
       });
     let decodedToken = jwt.verify(token, "blogSites-phase2");
 
     if (!decodedToken)
-      return res.status(403).send({ status: false, msg: "token is not valid" });
+      return res.status(403).send({ status: false, ERROR: "token is not valid" });
     let userLoggedIn = decodedToken.authId;
 
     let blogId = req.params.blogId;
@@ -66,7 +65,7 @@ const authoriseForUpdateandDelete = async function (req, res, next) {
       if (autherID != userLoggedIn)
         return res.status(401).send({
           status: false,
-          msg: "User logged is not allowed to modify the requested users data",
+          ERROR: "User logged is not allowed to modify the requested users data",
         });
     }
     if (!blogId) {
@@ -77,15 +76,15 @@ const authoriseForUpdateandDelete = async function (req, res, next) {
       if (autherID2 != userLoggedIn)
         return res.status(401).send({
           status: false,
-          msg: "User logged is not allowed to modify the requested users data",
+          ERROR: "User logged is not allowed to modify the requested users data",
         });
     }
 
     next();
   } catch (err) {
-    res.status(500).send({ ERROR: err.message });
+   return res.status(500).send({ ERROR: err.message });
   }
 };
 
+module.exports.autherAuthentication = autherAuthentication;
 module.exports.authorAuthorization = authorAuthorization;
-module.exports.authoriseForUpdateandDelete = authoriseForUpdateandDelete;
